@@ -1,0 +1,27 @@
+name: Validate P105 recovery base
+on:
+  push:
+    branches: [codex/p105-base-validation]
+permissions:
+  contents: read
+env:
+  HARDWARE_TAG: v0.1.10
+  CLI_TAG: v0.1.10
+  CLI_ARTIFACT_DIR: ''
+  HARDWARE_ARTIFACT_DIR: ''
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python: ['3.9', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 82e2c2ae7cd52c17357cff5d88858b6df34ba563
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: bash ci/dependencies --wheels-only
+      - run: .venv/bin/python -m unittest discover -s tests -v
